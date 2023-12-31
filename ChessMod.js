@@ -5104,7 +5104,8 @@ window.ChessMod.alterSnakeCode = function (code) {
                 }
                 window.appleArray[index].isPiece = false;
                 window.shield_empty_all();
-                if (!window.is_muted) {
+                debugger
+                if (!window.muted) {
                     window.capture_sound.play();
                 }
                 return true;
@@ -5327,6 +5328,8 @@ window.ChessMod.alterSnakeCode = function (code) {
         break;
     }
     window.selectedFruit=`)
+
+    code = code.assertReplace(/this\.muted=!/gm, `window.muted=$&`);
 
     window.shield_all = function shield_all() {
         eval(`window.appleArray.forEach(apple => {
