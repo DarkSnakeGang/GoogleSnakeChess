@@ -5104,7 +5104,7 @@ window.ChessMod.alterSnakeCode = function (code) {
                 }
                 window.appleArray[index].isPiece = false;
                 window.shield_empty_all();
-                debugger
+                
                 if (!window.muted) {
                     window.capture_sound.play();
                 }
