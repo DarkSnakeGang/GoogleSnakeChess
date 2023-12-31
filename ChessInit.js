@@ -157,23 +157,29 @@ window.ChessMod.alterSnakeCode = function (code) {
     }
 
     function getClosestPiecesToRook(rookPos, pieces) {
-        const closestPieces = [];
+        const closestPieces = {
+          up: { piece: null, distance: Infinity },
+          down: { piece: null, distance: Infinity },
+          left: { piece: null, distance: Infinity },
+          right: { piece: null, distance: Infinity },
+        };
       
         pieces.forEach(piece => {
-          if (piece.pos.x === rookPos.x && piece.pos.y < rookPos.y) {
-            closestPieces.push({ direction: 'up', piece, distance: Math.abs(piece.pos.y - rookPos.y) });
-          } else if (piece.pos.x === rookPos.x && piece.pos.y > rookPos.y) {
-            closestPieces.push({ direction: 'down', piece, distance: Math.abs(piece.pos.y - rookPos.y) });
-          } else if (piece.pos.y === rookPos.y && piece.pos.x < rookPos.x) {
-            closestPieces.push({ direction: 'left', piece, distance: Math.abs(piece.pos.x - rookPos.x) });
-          } else if (piece.pos.y === rookPos.y && piece.pos.x > rookPos.x) {
-            closestPieces.push({ direction: 'right', piece, distance: Math.abs(piece.pos.x - rookPos.x) });
+          const distance = Math.abs(piece.pos.x - rookPos.x) + Math.abs(piece.pos.y - rookPos.y);
+      
+          if (piece.pos.x === rookPos.x && piece.pos.y < rookPos.y && distance < closestPieces.up.distance) {
+            closestPieces.up = { piece, distance };
+          } else if (piece.pos.x === rookPos.x && piece.pos.y > rookPos.y && distance < closestPieces.down.distance) {
+            closestPieces.down = { piece, distance };
+          } else if (piece.pos.y === rookPos.y && piece.pos.x < rookPos.x && distance < closestPieces.left.distance) {
+            closestPieces.left = { piece, distance };
+          } else if (piece.pos.y === rookPos.y && piece.pos.x > rookPos.x && distance < closestPieces.right.distance) {
+            closestPieces.right = { piece, distance };
           }
         });
       
-        closestPieces.sort((a, b) => a.distance - b.distance);
-      
-        return closestPieces.map(({ piece }) => piece);
+        // Convert the object values to an array and return only the 'piece' property
+        return Object.values(closestPieces).map(({ piece }) => piece).filter(piece => piece !== null);
       }
 
     window.rook_open = function rook_open(headPos) {
@@ -187,6 +193,7 @@ window.ChessMod.alterSnakeCode = function (code) {
         }
         return false;
     }
+
 
     function getDistance(dx, dy) {
         return Math.abs(dx) + Math.abs(dy);
