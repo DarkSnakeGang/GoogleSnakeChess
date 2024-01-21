@@ -608,7 +608,14 @@ window.shield_empty_all();
     // "Shield all" when snake head state isn't "open"
     // 
 
+    mode_regex = new RegExp(/case "trophy"\:/)
+    mode_get_code = `case "trophy":d=15;`
+    code = code.assertReplace(mode_regex, mode_get_code);
 
+    //reset_regex = new RegExp(/;this\.reset\(\)/)
+
+    //catchError(reset_regex, code)
+    //code = code.assertReplace(reset_regex, `;window.CurrentModeNum=a.settings.wb=15;this.reset();`);
 
     window.final_code = code;
 
@@ -622,4 +629,38 @@ window.ChessMod.runCodeAfter = function () {
     modIndicator.textContent = 'Chess Mod';
     let canvasNode = document.getElementsByClassName('jNB0Ic')[0];
     document.getElementsByClassName('EjCLSb')[0].insertBefore(modIndicator, canvasNode);
+
+    function clickSettings() {
+        if(IS_FBX_OR_WEB) {
+            //Match mute button, but only if it's on (i.e. the image url includes the word up instead of the word off)
+            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
+            if(settingsButton) {settingsButton.click();}
+            return;
+        }
+    
+        //Only true if we can find the invis el and it has style "None"
+        let someRandomGameContainer = document.getElementsByClassName('ynlwjd')[0];
+        let isGameInvis = someRandomGameContainer && someRandomGameContainer.style.display === 'none';
+    
+        //Handle search snake here.
+        if(isGameInvis) {
+            console.log('Game not visible yet. Waiting to apply mute.');
+            setTimeout(applyMuteToGame, 400);
+        } else {
+            //Game is visible so safe to mute.
+            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
+            if(settingsButton) {settingsButton.click();}
+        }
+    }
+
+    clickSettings();
+
+    function unclickSettings(){
+        let settingsButton = document.querySelector('img[jsaction="AFvrle"]');
+            if(settingsButton) {settingsButton.click();}
+            return;
+    }
+
+    unclickSettings();
+
   };

@@ -4817,11 +4817,18 @@ window.CustomPortalPairs.alterCode = function (code) {
     counter_reset_code = `window.custom_pair_call_counter = 0;this.reset();`
 
     code = code.assertReplace(reset_regex, counter_reset_code);
-
-    portal_pairs_regex = new RegExp(/this\.[a-zA-Z0-9_$]{1,8}\[c\]\.[a-zA-Z0-9_$]{1,8}=[a-zA-Z0-9_$]{1,8}\(this\)/)
+    portal_pairs_regex = new RegExp(/this\.[a-zA-Z0-9_$]{1,8}\[[a-zA-Z0-9_$]{1,8}\]\.[a-zA-Z0-9_$]{1,8}=[a-zA-Z0-9_$]{1,8}\(this\)/)
+    catchError(portal_pairs_regex, code) // Third {1,8} here should be "type" - since this is where portal pair type is determined
     apple_array = code.match(portal_pairs_regex)[0].split('.')[1].split('[')[0]
     give_portal_type_func = code.match(portal_pairs_regex)[0].split('=')[1]
     apple_type = code.match(portal_pairs_regex)[0].split('.')[2].split('=')[0]
+    apple_index = code.match(portal_pairs_regex)[0].split('[')[1].split(']')[0]
+    if (window.NepDebug) {
+
+        console.log("Apple array: " + apple_array)
+        console.log("portal type func: " + give_portal_type_func)
+        console.log("apple type: " + apple_type)
+    }
 
     window.give_custom_pair = function () {
         window.custom_pair_call_counter = window.custom_pair_call_counter + 1;
@@ -4832,9 +4839,9 @@ window.CustomPortalPairs.alterCode = function (code) {
     }
 
     portal_pairs_code = `
-    if(window.pudding_settings.PortalPairs){this.${apple_array}[c].${apple_type} = window.give_custom_pair();
-    this.${apple_array}[c+1].${apple_type} = this.${apple_array}[c].${apple_type};}
-    else this.${apple_array}[c].${apple_type} = ${give_portal_type_func}
+    if(window.pudding_settings.PortalPairs){this.${apple_array}[${apple_index}].${apple_type} = window.give_custom_pair();
+    this.${apple_array}[${apple_index}+1].${apple_type} = this.${apple_array}[${apple_index}].${apple_type};}
+    else this.${apple_array}[${apple_index}].${apple_type} = ${give_portal_type_func}
     `
 
     code = code.assertReplace(portal_pairs_regex, portal_pairs_code);
@@ -4848,8 +4855,10 @@ window.CustomPortalPairs.alterCode = function (code) {
     }
 
     portal_dice_regex = new RegExp(/if\([a-zA-Z0-9_$]{1,8}\(this\.[a-zA-Z0-9_$]{1,8},2\)&&0<[a-zA-Z0-9_$]{1,8}\.length\)\{/)
+    catchError(portal_dice_regex, code)
     apple_dice_array = code.match(portal_dice_regex)[0].split('<')[1].split('.')[0];
     portal_dice_full_regex = new RegExp(/if\([a-zA-Z0-9_$]{1,8}\(this\.[a-zA-Z0-9_$]{1,8},2\)&&0<[a-zA-Z0-9_$]{1,8}\.length\)\{[^]*type}/gm)
+    catchError(portal_dice_full_regex, code)
     portal_pairs_dice_code = code.match(portal_dice_full_regex)[0]
 
     portal_dice_pairs_code = `
@@ -5650,7 +5659,14 @@ window.shield_empty_all();
     // "Shield all" when snake head state isn't "open"
     // 
 
+    mode_regex = new RegExp(/case "trophy"\:/)
+    mode_get_code = `case "trophy":d=15;`
+    code = code.assertReplace(mode_regex, mode_get_code);
 
+    //reset_regex = new RegExp(/;this\.reset\(\)/)
+
+    //catchError(reset_regex, code)
+    //code = code.assertReplace(reset_regex, `;window.CurrentModeNum=a.settings.wb=15;this.reset();`);
 
     window.final_code = code;
 
@@ -5664,4 +5680,38 @@ window.ChessMod.runCodeAfter = function () {
     modIndicator.textContent = 'Chess Mod';
     let canvasNode = document.getElementsByClassName('jNB0Ic')[0];
     document.getElementsByClassName('EjCLSb')[0].insertBefore(modIndicator, canvasNode);
+
+    function clickSettings() {
+        if(IS_FBX_OR_WEB) {
+            //Match mute button, but only if it's on (i.e. the image url includes the word up instead of the word off)
+            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
+            if(settingsButton) {settingsButton.click();}
+            return;
+        }
+    
+        //Only true if we can find the invis el and it has style "None"
+        let someRandomGameContainer = document.getElementsByClassName('ynlwjd')[0];
+        let isGameInvis = someRandomGameContainer && someRandomGameContainer.style.display === 'none';
+    
+        //Handle search snake here.
+        if(isGameInvis) {
+            console.log('Game not visible yet. Waiting to apply mute.');
+            setTimeout(applyMuteToGame, 400);
+        } else {
+            //Game is visible so safe to mute.
+            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
+            if(settingsButton) {settingsButton.click();}
+        }
+    }
+
+    clickSettings();
+
+    function unclickSettings(){
+        let settingsButton = document.querySelector('img[jsaction="AFvrle"]');
+            if(settingsButton) {settingsButton.click();}
+            return;
+    }
+
+    unclickSettings();
+
   };
