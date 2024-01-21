@@ -612,10 +612,10 @@ window.shield_empty_all();
     mode_get_code = `case "trophy":d=15;`
     code = code.assertReplace(mode_regex, mode_get_code);
 
-    //reset_regex = new RegExp(/;this\.reset\(\)/)
+    reset_regex = new RegExp(/;this\.reset\(\)/)
 
-    //catchError(reset_regex, code)
-    //code = code.assertReplace(reset_regex, `;window.CurrentModeNum=a.settings.wb=15;this.reset();`);
+    catchError(reset_regex, code)
+    code = code.assertReplace(reset_regex, `;if (!window.FIRSTCLICKDONE) {window.clickSettings()};this.reset();`);
 
     window.final_code = code;
 
@@ -630,37 +630,27 @@ window.ChessMod.runCodeAfter = function () {
     let canvasNode = document.getElementsByClassName('jNB0Ic')[0];
     document.getElementsByClassName('EjCLSb')[0].insertBefore(modIndicator, canvasNode);
 
-    function clickSettings() {
-        if(IS_FBX_OR_WEB) {
-            //Match mute button, but only if it's on (i.e. the image url includes the word up instead of the word off)
-            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
-            if(settingsButton) {settingsButton.click();}
-            return;
-        }
-    
-        //Only true if we can find the invis el and it has style "None"
-        let someRandomGameContainer = document.getElementsByClassName('ynlwjd')[0];
-        let isGameInvis = someRandomGameContainer && someRandomGameContainer.style.display === 'none';
-    
-        //Handle search snake here.
-        if(isGameInvis) {
-            console.log('Game not visible yet. Waiting to apply mute.');
-            setTimeout(applyMuteToGame, 400);
-        } else {
-            //Game is visible so safe to mute.
-            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
-            if(settingsButton) {settingsButton.click();}
-        }
-    }
-
-    clickSettings();
+    window.FIRSTCLICKDONE = false;
 
     function unclickSettings(){
         let settingsButton = document.querySelector('img[jsaction="AFvrle"]');
-            if(settingsButton) {settingsButton.click();}
-            return;
+        if(settingsButton) {settingsButton.click();}
+        if (!window.FIRSTCLICKDONE) {
+            window.FIRSTCLICKDONE = true // Will become true forever.
+            let actualPlayButton = document.querySelector('div[jsaction="JrrOHc"]');
+            if(actualPlayButton) {actualPlayButton.click();}
+        }
+        return;
     }
 
-    unclickSettings();
+     window.clickSettings = function clickSettings() {
+        let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
+        if(settingsButton) {settingsButton.click();}
+        unclickSettings();
+
+        return;
+    }
+
+    
 
   };
