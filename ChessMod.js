@@ -5055,9 +5055,26 @@ window.ChessMod.runCodeBefore = function () {
     window.PuddingMod.runCodeBefore();
     console.log("Adding Chess Mode (Replacing Shield)");
     chess_icon = "https://i.postimg.cc/ZqK0CB95/bn.png"
-    var images = document.querySelectorAll('#trophy')[0].children[15].src = chess_icon;
+    
+    for (let index = 0; index < document.querySelectorAll('#trophy')[0].children.length; index++) {
+        document.querySelectorAll('#trophy')[0].children[index].src = chess_icon
+    }
+    //var images = document.querySelectorAll('#trophy')[0].children[15].src = chess_icon;
     //var myImage = images[15];
-    console.log(images);
+    //console.log(images);
+
+    window.menuCleaner = function menuCleaner(menuName){
+        orig_len = document.querySelector(menuName).children.length
+        for (let index = orig_len; index != 1; index--) {
+          element = document.querySelector(menuName).children[index - 1];
+          document.querySelector(menuName).removeChild(element)
+        }
+      }
+  
+      menu_to_clean = ['#trophy']
+      menu_to_clean.forEach(element => {
+        menuCleaner(element)
+      });
 
     trophy_jsname = document.querySelector('img[src$="trophy_00.png"]').getAttribute("jsname")
     window.trophy_src = `document.querySelector('img[jsname="${trophy_jsname}"]').src `
@@ -5695,32 +5712,11 @@ window.ChessMod.runCodeAfter = function () {
     }
 
      window.clickSettings = function clickSettings() {
-        //if(IS_FBX_OR_WEB) {
-            //Match mute button, but only if it's on (i.e. the image url includes the word up instead of the word off)
-            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
-            if(settingsButton) {settingsButton.click();}
-            unclickSettings();
-
-            return;
-        //}
-    
-        //Only true if we can find the invis el and it has style "None"
-        let someRandomGameContainer = document.getElementsByClassName('ynlwjd')[0];
-        let isGameInvis = someRandomGameContainer && someRandomGameContainer.style.display === 'none';
-    
-        let playButtonSearch = document.querySelector('div[jsname="ZC7Tjb"]');
-        if(playButtonSearch) {playButtonSearch.click();}
-
-        //Handle search snake here.
-        if(isGameInvis) {
-            console.log('Game not visible yet. Waiting to apply mute.');
-            setTimeout(applyMuteToGame, 400);
-        } else {
-            //Game is visible so safe to mute.
-            let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
-            if(settingsButton) {settingsButton.click();}
-        }
+        let settingsButton = document.querySelector('div[jsaction="rxqFXd"]');
+        if(settingsButton) {settingsButton.click();}
         unclickSettings();
+
+        return;
     }
 
     
